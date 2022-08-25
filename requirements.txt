@@ -1,10 +1,10 @@
-matplotlib==3.3.4
-scikit-learn==0.24.2 
+matplotlib==3.5.3
+scikit-learn==1.1.2 
 cycler==0.11.0 
-fonttools==4.27.1 
+fonttools==4.37.1 
 joblib==1.1.0 
-kiwisolver==1.3.1 
-numpy==1.19.5
-pillow==8.4.0 
-scipy==1.5.4 
+kiwisolver==1.4.4 
+numpy==1.23.2 
+pillow==9.2.0 
+scipy==1.9.0 
 threadpoolctl==3.1.0

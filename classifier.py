@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 25 09:22:51 2022
+Created on Thu OCT 23 11:22:51 2022
 
 @author: Kishor
 """
@@ -51,3 +51,22 @@ print(
     f"Classification report for classifier {clf}:\n"
     f"{metrics.classification_report(y_test, predicted)}\n"
  )
+
+
+def completely_biased_y_n(x):
+    return pd.value_counts(x).shape[0]
+def preds_all_classes_y_n(x):
+    return pd.value_counts(x).shape[0]
+
+
+import unittest
+
+class TestNotebook(unittest.TestCase):
+    
+    def test_completely_biased_y_n(self):
+        self.assertEqual(completely_biased_y_n(predicted), 10)
+        
+    def test_preds_all_classes_y_n(self):
+        self.assertEqual(preds_all_classes_y_n(predicted), 10)
+
+unittest.main(argv=[''], verbosity=2, exit=False)

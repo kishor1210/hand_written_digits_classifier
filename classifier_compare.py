@@ -16,9 +16,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score,precision_score,recall_score
 from sklearn.tree import DecisionTreeClassifier
 
-
+#load the digits
 digits = load_digits()
 
+# compare with labels 
 def label_compare(y_true,y_pred):
     cnt=0
     

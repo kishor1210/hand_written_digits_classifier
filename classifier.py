@@ -1,53 +1,75 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 25 09:22:51 2022
+Created on Sun Nov 20 18:35:51 2022
 
-@author: Kishor
+@author: kishor
 """
 
-# Standard scientific Python imports
-import matplotlib.pyplot as plt
-
-# Import datasets, classifiers, and performance metrics
-from sklearn import datasets, svm, metrics
+import pandas as pd
+import numpy as np
+import argparse
+	# Standard scientific Python imports
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score,precision_score,recall_score
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_digits
+from sklearn.model_selection import GridSearchCV
+#load the digits
+digits = load_digits()
 
 
-digits = datasets.load_digits()
 
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, label in zip(axes, digits.images, digits.target):
-    ax.set_axis_off()
-    ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-    ax.set_title("Training: %i" % label)
 
-# flatten the images
-n_samples = len(digits.images)
-data = digits.images.reshape((n_samples, -1))
+def build_classifier(args):
+    acc =[]
+    TP=[]
+    precision, recall = [],[]
+    # flatten the images
+    n_samples = len(digits.images)
+    data = digits.images.reshape((n_samples, -1))
+    target = digits.target
+    random_state = args.random_state
 
-# Create a classifier: a support vector classifier
-clf = svm.SVC(gamma=0.001)
-
-# Split data into 50% train and 50% test subsets
-X_train, X_test, y_train, y_test = train_test_split(
-            data, digits.target, test_size=0.5, shuffle=False
+    X_train, X_test, y_train, y_test = train_test_split(
+            data, digits.target, test_size=0.2, shuffle=False,random_state=random_state
             )
 
-# Learn the digits on the train subset
-clf.fit(X_train, y_train)
+    X_train, X_dev, y_train, y_dev = train_test_split(
+            X_train, y_train, test_size=0.2, shuffle=False,random_state=random_state)
 
-# Predict the value of the digit on the test subset
-predicted = clf.predict(X_test)
+        
+    if args.clf_name=='svm':
+        # defining parameter range
+        param_grid = {'C': [0.1, 1, 10], 
+                          'gamma': [1, 0.1, 0.01],
+                          'kernel': ['rbf']} 
+              
+        model = GridSearchCV(SVC(), param_grid, refit = True, verbose = 3)
+    else:
+        param_grid = { 'criterion':['gini','entropy'],'max_depth': np.arange(3, 6)}
+            
+        model = GridSearchCV(DecisionTreeClassifier(), param_grid,refit = True, verbose = 3)
+        
+    model.fit(X_train, y_train)
+        
+    y_pred = model.predict(X_test)
+        
+
+        
+    return len(y_pred)
 
 
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, prediction in zip(axes, X_test, predicted):
-    ax.set_axis_off()
-    image = image.reshape(8, 8)
-    ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-    ax.set_title(f"Prediction: {prediction}")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--clf_name', default='svm') 
+    parser.add_argument('--random_state' , default= 34) 
+    args = parser.parse_args()
     
-print(
-    f"Classification report for classifier {clf}:\n"
-    f"{metrics.classification_report(y_test, predicted)}\n"
- )
+    
+    print(build_classifier(args))
+
+
+
+
+

@@ -22,13 +22,11 @@ digits = load_digits()
 
 
 def build_classifier(args):
-    acc =[]
-    TP=[]
-    precision, recall = [],[]
+
     # flatten the images
     n_samples = len(digits.images)
     data = digits.images.reshape((n_samples, -1))
-    target = digits.target
+
     random_state = args.random_state
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -45,19 +43,21 @@ def build_classifier(args):
                           'gamma': [1, 0.1, 0.01],
                           'kernel': ['rbf']} 
               
-        model = GridSearchCV(SVC(), param_grid, refit = True, verbose = 3)
+        model = GridSearchCV(SVC(), param_grid, refit = True)
     else:
         param_grid = { 'criterion':['gini','entropy'],'max_depth': np.arange(3, 6)}
             
-        model = GridSearchCV(DecisionTreeClassifier(), param_grid,refit = True, verbose = 3)
+        model = GridSearchCV(DecisionTreeClassifier(), param_grid,refit = True)
         
     model.fit(X_train, y_train)
         
     y_pred = model.predict(X_test)
-        
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test,y_pred, average='weighted')
+    accuracy = accuracy_score(y_test, y_pred)
 
         
-    return len(y_pred)
+    return precision,recall,accuracy
 
 
 if __name__ == '__main__':
@@ -67,7 +67,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     
-    print(build_classifier(args))
+    precision,recall,accuracy = build_classifier(args)
+    
+    print("Test accuracy:", accuracy)
+    print("Test precision:", precision)
+    print("Test recall:", recall)
 
 
 
